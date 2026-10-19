@@ -1,0 +1,15 @@
+/* Mobile drawer; desktop keeps its collapsible sidebar. */
+(() => {
+ const body=document.body,sidebar=$('sidebar'),toggle=$('sidebar-toggle'),content=sidebar.querySelector('.sidebar-content'),chat=$('chat'),main=chat.querySelector('.chat-main'),mobile=matchMedia('(max-width:800px)'),settings=document.querySelector('.web-settings-button');
+ const overlay=document.createElement('button');overlay.type='button';overlay.className='mobile-nav-backdrop';overlay.hidden=true;overlay.tabIndex=-1;overlay.setAttribute('aria-label','Cerrar menú');sidebar.before(overlay);
+ content.id='sidebar-content';toggle.setAttribute('aria-controls',content.id);toggle.setAttribute('aria-expanded','true');let returnFocus=null;
+ function setOpen(open,restore=true){const visible=mobile.matches&&body.dataset.screen==='chat'&&open;body.classList.toggle('mobile-menu-open',visible);overlay.hidden=!visible;toggle.setAttribute('aria-expanded',String(mobile.matches?visible:!body.classList.contains('collapsed')));toggle.setAttribute('aria-label',mobile.matches?(visible?'Cerrar menú':'Abrir menú'):(body.classList.contains('collapsed')?'Expandir menú':'Contraer menú'));toggle.textContent=visible?'×':'☰';if(mobile.matches){content.inert=!visible;content.setAttribute('aria-hidden',String(!visible));main.inert=visible;}else{content.inert=body.classList.contains('collapsed');content.removeAttribute('aria-hidden');main.inert=false;}if(!visible&&restore&&returnFocus){const focus=returnFocus;returnFocus=null;if(focus.isConnected)focus.focus();}}
+ function sync(){setOpen(false,false);returnFocus=null;if(settings){if(mobile.matches&&body.dataset.screen==='chat'){content.append(settings);settings.classList.add('in-sidebar');}else{body.append(settings);settings.classList.remove('in-sidebar');}}}
+ toggle.onclick=()=>{if(mobile.matches){const open=!body.classList.contains('mobile-menu-open');if(open)returnFocus=toggle;setOpen(open);if(open)content.querySelector('button')?.focus();}else{body.classList.toggle('collapsed');setOpen(false,false);}};
+ overlay.onclick=()=>setOpen(false);
+ document.addEventListener('keydown',event=>{if(!body.classList.contains('mobile-menu-open'))return;if(event.key==='Escape'){event.preventDefault();setOpen(false);return;}if(event.key==='Tab'){const nodes=[toggle,...content.querySelectorAll('button:not([disabled]),a[href],input:not([disabled])')].filter(n=>!n.hidden);const first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
+ content.addEventListener('click',event=>{if(mobile.matches&&event.target.closest('button,a')){setOpen(false,false);returnFocus=null;}});
+ const original=screen;screen=function(name){setOpen(false,false);original(name);sync();};
+ if(mobile.addEventListener)mobile.addEventListener('change',sync);else mobile.addListener(sync);
+ window.RequiNav={close:()=>setOpen(false),sync};sync();
+})();
