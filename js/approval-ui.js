@@ -1,7 +1,0 @@
-(() => {
- const status=a=>({pending:'Pendiente por aprobar',approved:'Aprobada',rejected:'No aprobada'})[a?.status]||'Pendiente por aprobar';
- const mail=a=>({pending:'Correo pendiente de envío',sending:'Enviando correo',accepted:'Correo aceptado por Outlook',confirmed:'Envío confirmado en Enviados',failed:'Correo no enviado',unknown:'Envío sin confirmar','not-required':''})[a?.email?.status]||'';
- function comments(a){let dialog=document.getElementById('approval-comments');if(!dialog){dialog=document.createElement('dialog');dialog.id='approval-comments';dialog.className='glass comments-dialog';dialog.innerHTML='<div class="settings-heading"><h2>Motivo de no aprobación</h2><button class="icon" aria-label="Cerrar">×</button></div><p class="decision-comments"></p><p class="decision-date"></p>';document.body.append(dialog);dialog.querySelector('button').onclick=()=>dialog.close();}dialog.querySelector('.decision-comments').textContent=a.comments;dialog.querySelector('.decision-date').textContent=a.decidedAt?new Date(a.decidedAt).toLocaleString('es-MX'):'';dialog.showModal();}
- function badge(a){const node=document.createElement(a?.status==='rejected'?'button':'span');node.className='approval-badge '+(a?.status||'pending');node.textContent=status(a);if(a?.status==='rejected'){node.type='button';node.title='Ver comentarios de no aprobación';node.onclick=()=>comments(a);}return node;}
- globalThis.RequiApproval={status,mail,comments,badge};
-})();

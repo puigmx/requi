@@ -1,1 +1,0 @@
-if(!globalThis.setImmediate){globalThis.setImmediate=(fn,...args)=>setTimeout(()=>fn(...args),0);globalThis.clearImmediate=clearTimeout;}
